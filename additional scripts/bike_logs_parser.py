@@ -124,21 +124,20 @@ def getGPUlogData(stime, gpu_log_file):
 
 # return arrays with the timestamps and lables
 def getStepsData(logpath):
-    stime, time_stamps, lables, etime = 0, [0], [], 0
+    stime, time_stamps, lables, totalTime = 0, [0], [], 0
 
     with open(logpath) as f:
         for line in f:
             if "Step" in line:
-                line_data = line.split("\": \"")
-                timestamp = datetime.datetime.strptime(line_data[1][:-3], "%d/%m/%y %I:%M:%S %p")
-                time_stamps.append((timestamp - stime).total_seconds())
+                line_data = line.split("\": ")
+                time_stamps.append(float(line_data[1][:-2]))
                 lables.append(line_data[0][2:])
             elif "Start" in line:
                 stime = datetime.datetime.strptime(line.split("\": \"")[1][:-3], "%d/%m/%y %I:%M:%S %p")
-            elif "End" in line:
-                etime = datetime.datetime.strptime(line.split("\": \"")[1][:-2], "%d/%m/%y %I:%M:%S %p")
+            elif "Total time" in line:
+                totalTime = float(line_data[1][:-2])
 
-    return stime, time_stamps, lables, (etime - stime).total_seconds()
+    return stime, time_stamps, lables, totalTime
 
 
 def process(steps_log_path, isScrewMacro, isOHM, ohmLogPath):

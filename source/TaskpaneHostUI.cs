@@ -66,9 +66,10 @@ namespace solid_macro
 
             AddString("{");
 
+            _startTime = DateTime.Now;
             // start of rectangle and cut
             // step - time between the previous and the next logged time starting from this point
-            AddJsonString("Start");
+            AddJsonStartEndString("Start");
 
             _model = (ModelDoc2)_swApp.ActiveDoc;
 
@@ -1158,8 +1159,9 @@ namespace solid_macro
             //Zoom
             Zoom();
             AddJsonString("Step 12 (Zoom)");
+            AddJsonString("Total time");
 
-            AddJsonString("End", "");
+            AddJsonStartEndString("End", "");
             AddString("}");
             File.WriteAllLines(@"C:\\VAYU\\bike_log" + _resCount++ + ".json", _jsonRows);
         }
@@ -3272,7 +3274,10 @@ namespace solid_macro
 
         private void AddString(string s) => _jsonRows.Add(String.Format("{0}", s));
 
-        private void AddJsonString(string s, string end = ",") =>
+        private void AddJsonString(string s) =>
+            _jsonRows.Add(String.Format("\t\"{0}\": {1},", s, (DateTime.Now - _startTime).TotalSeconds));
+
+        private void AddJsonStartEndString(string s, string end = ",") =>
             _jsonRows.Add(String.Format("\t\"{0}\": \"{1}\"{2}", s, DateTime.Now.ToString("dd/MM/y hh:mm:ss tt"), end));
 
         private void DebugLog(string s)
@@ -3303,6 +3308,7 @@ namespace solid_macro
         private List<string> _steps = new List<string> { "Step 3 (Extrude cut)", "Step 6 (extrude cut)", "Step 8 (Mirroring 1)", "Step 8 (Mirroring 2)" };
         private int _counter = 0;
         private int _resCount = 1;
+        private DateTime _startTime;
 
         /// <summary>
         /// switcher to avoid redurant logging
