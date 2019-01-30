@@ -1,0 +1,1 @@
+Copy `solid_macro.dll` to `C:\VAYU\` end run registrate_add_in.bat as Administrator
