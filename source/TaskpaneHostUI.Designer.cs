@@ -30,6 +30,7 @@
         {
             this.open_assembly_button = new System.Windows.Forms.Button();
             this.execute_test_button = new System.Windows.Forms.Button();
+            this.screw_macro = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // open_assembly_button
@@ -53,10 +54,21 @@
             this.execute_test_button.UseVisualStyleBackColor = true;
             this.execute_test_button.Click += new System.EventHandler(this.BikeTest_Click);
             // 
+            // screw_macro
+            // 
+            this.screw_macro.Location = new System.Drawing.Point(10, 104);
+            this.screw_macro.Name = "screw_macro";
+            this.screw_macro.Size = new System.Drawing.Size(122, 40);
+            this.screw_macro.TabIndex = 2;
+            this.screw_macro.Text = "ScrewMacro";
+            this.screw_macro.UseVisualStyleBackColor = true;
+            this.screw_macro.Click += new System.EventHandler(this.screw_macro_Click);
+            // 
             // TaskpaneHostUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.screw_macro);
             this.Controls.Add(this.execute_test_button);
             this.Controls.Add(this.open_assembly_button);
             this.Name = "TaskpaneHostUI";
@@ -69,5 +81,6 @@
 
         private System.Windows.Forms.Button open_assembly_button;
         private System.Windows.Forms.Button execute_test_button;
+        private System.Windows.Forms.Button screw_macro;
     }
 }
