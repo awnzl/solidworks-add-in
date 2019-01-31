@@ -1171,9 +1171,6 @@ namespace solid_macro
             string templateName = _swApp.GetUserPreferenceStringValue((int)swUserPreferenceStringValue_e.swDefaultTemplatePart);
             ModelDoc2 model = (ModelDoc2)_swApp.NewDocument(templateName, (int)swDwgPaperSizes_e.swDwgPaperAsize, 0.0, 0.0);
 
-
-
-            _counter = 0;
             _switcher = false;
             _jsonRows = new List<string>();
 

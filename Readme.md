@@ -10,4 +10,4 @@ If you don't see add-in on the SolidWorks' Taskpane, go to `Tools` menu -> `Add-
 
 Make sure, that you configure GPU-Z to logging needed information (see `additional scripts/Readme.md`).  
 Use GPU-Z to logging video-card information and `additional scripts/cpu_usage_logger.py` for logging cpu-load information.  
-Use `bike_logs_parser.py` from `additional scripts` directory to create charts from bike-logs.  
+Use `logs_parser.py` from `additional scripts` directory to create charts from log files.  

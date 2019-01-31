@@ -21,3 +21,5 @@ Then execute script-button.
 You might execute macros multiple times, but before that each time you need to delete all changes.  
 For each execution during SW working session, the macros save a new log file with adding index.  
 Log files will be saved in `c:\VAYU\` folder.  
+
+For screw macro just press `screw macro` button.  

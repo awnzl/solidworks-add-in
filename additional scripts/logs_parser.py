@@ -181,30 +181,14 @@ def process(steps_log_path, isScrewMacro, isOHM, ohmLogPath):
     ax2.set_ylim(15, 100)
     ax2.set_xlim(0, chartLength)
 
-    scr_labels = ["Step 1-3 (Hexagon)",
-                  "Step 4-5 (Cylinder)",
-                  "Step 6 (Helix)",
-                  "Step 7 (Thread SweepCut)",
-                  "Step 8-9 (Extruded Elliptical Slot)",
-                  "Step 10-11 (Drill sketch)",
-                  "Step 12-13 (Revolved Boss)",
-                  "Step 14 (Helix - drill)",
-                  "Step 14 (SweepCut - drill)",
-                  "Step 15-17 (Lofted Boss)",
-                  "Step 18 (Lofted Surfaces)",
-                  "Step 19 (Zoom View)",
-                  "Step 20 (Roll View)",
-                  "Step 21 (Rotate)",
-                  "Step 22 (Pan)"]
-
-    for idx in range(0, len(steps_data) - 1):
+    for idx in range(len(steps_data) - 1):
         ax0.axvspan(steps_data[idx], steps_data[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
         ax1.axvspan(steps_data[idx], steps_data[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
         ax2.axvspan(steps_data[idx], steps_data[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
 
-    for idx in range(len(scr_labels if isScrewMacro else labels)):
-        ax0.text(steps_data[idx], 100, (scr_labels if isScrewMacro else labels)[idx].split('(')[1][:-1], rotation=90, verticalalignment='top')
-        ax2.text(steps_data[idx], 100, (scr_labels if isScrewMacro else labels)[idx].split('(')[0], rotation=90, verticalalignment='top')
+    for time, label in zip(steps_data, labels):
+        ax0.text(time, 100, label.split('(')[1][:-1], rotation=90, verticalalignment='top')
+        ax2.text(time, 100, label.split('(')[0], rotation=90, verticalalignment='top')
 
 
     ax0.plot(cpu_data, '-g', label='cpu')
@@ -227,13 +211,11 @@ def getUsage():
     return ('''Instruction:
     Run GPU-Z
     Run cpu_usage_logger.py
-    Or run OpenHardwareMonitor and turn on logging
     Run SolidWorks' bike or screw macros
-    After macros will be done, stop cpu_usage_logger.py or
-    OpenHardwareMonitor and run logs_parser.py to build
-    results graph:
-        python cpu_gpu_usage.py [-s]
-        -s - for screw macro''')
+    After macros will be done, stop cpu_usage_logger.py to save
+    cpu-usage log-file and then run logs_parser.py to build results graph:
+        python logs_parser.py -l[s] path/to/log.json
+        -s - option for screw-macro log-files''')
 
 
 if __name__ == '__main__':
