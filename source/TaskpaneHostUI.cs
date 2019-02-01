@@ -67,6 +67,7 @@ namespace solid_macro
             AddString("{");
 
             _startTime = DateTime.Now;
+            _previousTime = _startTime;
             // start of rectangle and cut
             // step - time between the previous and the next logged time starting from this point
             AddJsonStartEndString("Start");
@@ -1159,7 +1160,7 @@ namespace solid_macro
             //Zoom
             Zoom(_model);
             AddJsonString("Step 12 (Zoom)");
-            AddJsonString("Total time");
+            AddTotalTimeJsonString();
 
             _model.ShowNamedView2("*Isometric", 7);
             _model.ViewZoomtofit2();
@@ -1180,6 +1181,7 @@ namespace solid_macro
             AddString("{");
 
             _startTime = DateTime.Now;
+            _previousTime = _startTime;
             AddJsonStartEndString("Start");
 
             //Hexagon and Cylinder
@@ -1536,7 +1538,7 @@ namespace solid_macro
             Pan(model);
             model.ClearSelection2(true);
             AddJsonString("Step 22 (Pan)");
-            AddJsonString("Total time");
+            AddTotalTimeJsonString();
 
             model.ShowNamedView2("*Isometric", 7);
             model.ViewZoomtofit2();
@@ -1770,11 +1772,20 @@ namespace solid_macro
 
         private void AddString(string s) => _jsonRows.Add(String.Format("{0}", s));
 
-        private void AddJsonString(string s) =>
-            _jsonRows.Add(String.Format("\t\"{0}\": {1},", s, (DateTime.Now - _startTime).TotalSeconds));
+        private void AddJsonString(string s)
+        {
+            _jsonRows.Add(String.Format("\t\"{0}\": {1},", s, (DateTime.Now - _previousTime).TotalSeconds));
+            _previousTime = DateTime.Now;
+        }
 
-        private void AddJsonStartEndString(string s, string end = ",") =>
+        private void AddJsonStartEndString(string s, string end = ",")
+        {
             _jsonRows.Add(String.Format("\t\"{0}\": \"{1}\"{2}", s, DateTime.Now.ToString("dd/MM/y hh:mm:ss tt"), end));
+            _previousTime = DateTime.Now;
+        }
+
+        private void AddTotalTimeJsonString() =>
+            _jsonRows.Add(String.Format("\t\"Total time\": {0},", (DateTime.Now - _startTime).TotalSeconds));
 
         private void DebugLog(string s)
         {
@@ -1806,6 +1817,7 @@ namespace solid_macro
         private int _resCount = 1;
         private int _scrResCount = 1;
         private DateTime _startTime;
+        private DateTime _previousTime;
 
         /// <summary>
         /// switcher to avoid redurant logging

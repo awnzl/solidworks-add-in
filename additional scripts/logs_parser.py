@@ -124,27 +124,29 @@ def getGPUlogData(stime, gpu_log_file):
 
 # return arrays with the timestamps and lables
 def getStepsData(logpath):
-    stime, time_stamps, lables, totalTime = 0, [0], [], 0
+    stime, time_limits, lables, total_time = 0, [0], [], 0
+    all_time = 0
 
     with open(logpath) as f:
         for line in f:
             if "Step" in line:
                 line_data = line.split("\": ")
-                time_stamps.append(float(line_data[1][:-2]))
+                all_time += float(line_data[1][:-2])
+                time_limits.append(all_time)
                 lables.append(line_data[0][2:])
             elif "Start" in line:
                 stime = datetime.datetime.strptime(line.split("\": \"")[1][:-3], "%d/%m/%y %I:%M:%S %p")
             elif "Total time" in line:
-                totalTime = float(line_data[1][:-2])
+                total_time = float(line.split("\": ")[1][:-2])
 
-    return stime, time_stamps, lables, totalTime
+    return stime, time_limits, lables, total_time
 
 
 def process(steps_log_path, isScrewMacro, isOHM, ohmLogPath):
     docsFolder = (os.path.expanduser("~") + "\\Documents\\")
 
     # uses for mark steps on the chart
-    startTime, steps_data, labels, chartLength = getStepsData(steps_log_path)
+    startTime, steps_limits, labels, chart_length = getStepsData(steps_log_path)
 
     cpu_data, gpu_load, gpu_mem, gpu_core = [], [], [], []
     if isOHM:
@@ -173,20 +175,20 @@ def process(steps_log_path, isScrewMacro, isOHM, ohmLogPath):
     ax1 = plt.subplot2grid((7, 1), (4, 0), rowspan=1)
     ax2 = plt.subplot2grid((7, 1), (5, 0), rowspan=2)
 
-    chartLength += 5 if isScrewMacro else 50
+    chart_length += 5 if isScrewMacro else 50
     ax0.set_ylim(0, 100)
-    ax0.set_xlim(0, chartLength)
+    ax0.set_xlim(0, chart_length)
     ax1.get_yaxis().set_ticks([])
-    ax1.set_xlim(0, chartLength)
+    ax1.set_xlim(0, chart_length)
     ax2.set_ylim(15, 100)
-    ax2.set_xlim(0, chartLength)
+    ax2.set_xlim(0, chart_length)
 
-    for idx in range(len(steps_data) - 1):
-        ax0.axvspan(steps_data[idx], steps_data[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
-        ax1.axvspan(steps_data[idx], steps_data[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
-        ax2.axvspan(steps_data[idx], steps_data[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
+    for idx in range(len(steps_limits) - 1):
+        ax0.axvspan(steps_limits[idx], steps_limits[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
+        ax1.axvspan(steps_limits[idx], steps_limits[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
+        ax2.axvspan(steps_limits[idx], steps_limits[idx+1], 0, 100, facecolor=('#d5dbe7' if idx % 2 else '#a4c5fc'), alpha=0.5)
 
-    for time, label in zip(steps_data, labels):
+    for time, label in zip(steps_limits, labels):
         ax0.text(time, 100, label.split('(')[1][:-1], rotation=90, verticalalignment='top')
         ax2.text(time, 100, label.split('(')[0], rotation=90, verticalalignment='top')
 
