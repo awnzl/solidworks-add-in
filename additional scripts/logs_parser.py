@@ -57,7 +57,7 @@ def parsOHMlogs(stime, cpu_data, gpu_data, logfile):
 
     with io.open(logfile, newline='', encoding='utf-8') as f:
         for line in f:
-            rowArray = line.split(',')
+            row_array = line.split(',')
             #0, 1,               2,               3,               4,               5,               6,               7,               8,               9,               10,              11,         12,         13,         14,                     15,             16,                 17,               18,               19,                 20,              21,                  22
             # ,/amdcpu/0/load/1,/amdcpu/0/load/2,/amdcpu/0/load/3,/amdcpu/0/load/4,/amdcpu/0/load/0,/amdcpu/1/load/1,/amdcpu/1/load/2,/amdcpu/1/load/3,/amdcpu/1/load/4,/amdcpu/1/load/0,/ram/load/0,/ram/data/0,/ram/data/1,/atigpu/0/temperature/0,/atigpu/0/fan/0,/atigpu/0/control/0,/atigpu/0/clock/0,/atigpu/0/clock/1,/atigpu/0/voltage/0,/atigpu/0/load/0,/hdd/0/temperature/0,/hdd/0/load/0
             # Time,"CPU Core #1","CPU Core #2","CPU Core #3","CPU Core #4","CPU Total","CPU Core #1","CPU Core #2","CPU Core #3","CPU Core #4","CPU Total","Memory","Used Memory","Available Memory","GPU Core","GPU Fan","GPU Fan","GPU Core","GPU Memory","GPU Core","GPU Core","Temperature","Used Space"
@@ -66,18 +66,18 @@ def parsOHMlogs(stime, cpu_data, gpu_data, logfile):
             # 12/21/2018 13:06:53,20.3125,11.1111107,20.3125,9.523809,15.3149843,15.625,14.0625,20.3125,15.625,16.40625,44.3697853,14.1754227,17.7729454,36,0,26,33,167,0.75000006,0,31,37.11359
             # 12/21/2018 13:06:54,3.125,0,0,0,0.78125,3.125,0,6.25,1.5625,2.734375,44.3686752,14.1750679,17.7733,35,0,26,30,167,0.75000006,0,31,37.11359
             nCpuCores = 8.0 # need to be adjusted for different CPUs
-            if isNotFound and stime == rowArray[0]:
+            if isNotFound and stime == row_array[0]:
                 isNotFound = False
             elif not isNotFound:
-                cpu_data.append((float(rowArray[1]) +
-                                 float(rowArray[2]) +
-                                 float(rowArray[3]) +
-                                 float(rowArray[4]) +
-                                 float(rowArray[6]) +
-                                 float(rowArray[7]) +
-                                 float(rowArray[8]) +
-                                 float(rowArray[9])) / nCpuCores)
-                gpu_data.append(float(rowArray[20]))
+                cpu_data.append((float(row_array[1]) +
+                                 float(row_array[2]) +
+                                 float(row_array[3]) +
+                                 float(row_array[4]) +
+                                 float(row_array[6]) +
+                                 float(row_array[7]) +
+                                 float(row_array[8]) +
+                                 float(row_array[9])) / nCpuCores)
+                gpu_data.append(float(row_array[20]))
 
 
 def getCPUlogData(stime, cpu_log_file):
@@ -86,13 +86,13 @@ def getCPUlogData(stime, cpu_log_file):
 
     with io.open(cpu_log_file, newline='', encoding='utf-8') as f:
         for line in f:
-            rowArray = line.split(',')
+            row_array = line.split(',')
                                        # %Y-%m-%d %H:%M:%S.%f
                                        # 2018-12-21 11:57:56.608369, 23.6,
-            if isNotFound and stime == rowArray[0].split('.')[0]:
+            if isNotFound and stime == row_array[0].split('.')[0]:
                 isNotFound = False
             elif not isNotFound:
-                ret.append(float(rowArray[1]))
+                ret.append(float(row_array[1]))
 
     return ret
 
@@ -102,16 +102,26 @@ def getGPUlogData(stime, gpu_log_file):
     load, mem, core = [], [], []
     isNotFound = True
 
-    with io.open(gpu_log_file, newline='', encoding='utf-8') as f:
-        for row in csv.reader(f):
-            rowArray = re.sub("['\[\]]", '', str(row)).split(',')
+    # with io.open(gpu_log_file, newline='', encoding='utf-8') as f:
+    #     for row in csv.reader(f):
+    #         row_array = re.sub("['\[\]]", '', str(row)).split(',')
 
-            if isNotFound and stime == rowArray[0].split('.')[0].strip():
-                isNotFound = False
-            elif not isNotFound and rowArray[3].strip().isdigit():
-                load.append(int(rowArray[3]))
-                mem.append(float(rowArray[2]) / 100)
-                core.append(float(rowArray[1]) / 12.5)
+    #         if isNotFound and stime == row_array[0].split('.')[0].strip():
+    #             isNotFound = False
+    #         elif not isNotFound and row_array[3].strip().isdigit():
+    #             load.append(int(row_array[3]))
+    #             mem.append(float(row_array[2]) / 100)
+    #             core.append(float(row_array[1]) / 12.5)
+
+    for line in io.open(gpu_log_file, newline='', encoding='utf-8'):
+        row_array = line.split(',')
+
+        if isNotFound and stime == row_array[0].split('.')[0].strip():
+            isNotFound = False
+        elif not isNotFound and row_array[3].strip().isdigit():
+            load.append(int(row_array[3]))
+            mem.append(float(row_array[2]) / 100)
+            core.append(float(row_array[1]) / 12.5)
 
     # ret = []
     # idx = 0

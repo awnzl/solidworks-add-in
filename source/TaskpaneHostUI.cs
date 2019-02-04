@@ -42,7 +42,7 @@ namespace solid_macro
 
         #region Private members
 
-        private void OpenAssembly_Click(object sender, System.EventArgs e)
+        private void OpenAssembly()
         {
             int errors = 0;
             int warnings = 0;
@@ -54,15 +54,29 @@ namespace solid_macro
                 "",
                 errors,
                 warnings);
-            this.execute_test_button.Enabled = true;
-            this.open_assembly_button.Enabled = false;
         }
 
-        private void BikeTest_Click(object sender, System.EventArgs e)
+        private void CloseAssembly()
+        {
+            _swApp.CloseDoc("C:\\VAYU\\AMD - RADEON\\SKLOPNI_PINKY\\AMD_Bike_by_paX.SLDASM");
+            _model = null;
+            _modelView = null;
+        }
+
+        //private void OpenAssembly_Click(object sender, System.EventArgs e)
+        //{
+        //    OpenAssembly();
+        //    //this.execute_test_button.Enabled = true;
+        //    //this.open_assembly_button.Enabled = false;
+        //}
+
+        private void ExecuteBikeTest()
         {
             _counter = 0;
             _switcher = false;
             _jsonRows = new List<string>();
+
+            OpenAssembly();
 
             AddString("{");
 
@@ -94,6 +108,7 @@ namespace solid_macro
 
             AddJsonString("Step 1-2 (Rectangle)");
 
+            //rename sketch
             _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "rectangle");
 
@@ -104,6 +119,9 @@ namespace solid_macro
             _model.FeatureManager.FeatureCut4(false, false, false, 9, 1, 0.01, 0.01, false, false, false, false,
                 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             _model.SelectionManager.EnableContourSelection = false;
+
+            _model.Extension.SelectByID2("Cut-Extrude", "BODYFEATURE", 0, 0, 0, false, 0, null, 0);
+            _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "extrude1");
             _model.ClearSelection2(true);
             // end of rectangle's extruded cut - logged by ui handler
 
@@ -124,6 +142,10 @@ namespace solid_macro
             _model.ClearSelection2(true);
             _model.SketchManager.InsertSketch(true);
 
+            //rename sketch
+            _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
+            _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "circles");
+
             AddJsonString("Step 4-5 (four circles)");
             // four circles end
 
@@ -131,6 +153,9 @@ namespace solid_macro
             _model.FeatureManager.FeatureCut4(false, false, false, 9, 1, 0.01, 0.01, false, false, false, false,
                 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, true, true, true, true, false, 0, 0, false, false);
             _model.SelectionManager.EnableContourSelection = false;
+
+            _model.Extension.SelectByID2("Cut-Extrude", "BODYFEATURE", 0, 0, 0, false, 0, null, 0);
+            _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "extrude2");
             _model.ClearSelection2(true);
             // end of four circles' ectruding - logged by ui handler
 
@@ -563,6 +588,7 @@ namespace solid_macro
             _switcher = true;
             swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
                 (swCompsOrient), false, null, true, null, 0, "Mirror", "", 2098193, false, false, false);
+            _model.ClearSelection2(true);
 
             //swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
             //    (swCompsOrient), false, null, false, null, 0, "Mirror", "", 2098193, false, false, false);
@@ -1137,6 +1163,7 @@ namespace solid_macro
             _switcher = true;
             swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
                 (swCompsOrient), false, null, true, null, 0, "Mirror", "", 2098193, false, false, false);
+            _model.ClearSelection2(true);
 
             if (swMirrorStatus == null)
                 DebugLog("second mirroring: swMirrorStatus is null, swAssy.MirrorComponents3 didn't return anything");
@@ -1168,9 +1195,17 @@ namespace solid_macro
             AddJsonStartEndString("End", "");
             AddString("}");
             File.WriteAllLines(@"C:\\VAYU\\bike_log" + _resCount++ + ".json", _jsonRows);
+
+            CloseAssembly();
         }
 
-        private void screw_macro_Click(object sender, EventArgs e)
+        private void BikeTest_Click(object sender, System.EventArgs e)
+        {
+            for (var idx = 0; idx < Int32.Parse(this.bike_tests_num.Text); ++idx)
+                ExecuteBikeTest();
+        }
+
+        private void ExecuteScrewTest()
         {
             string templateName = _swApp.GetUserPreferenceStringValue((int)swUserPreferenceStringValue_e.swDefaultTemplatePart);
             ModelDoc2 model = (ModelDoc2)_swApp.NewDocument(templateName, (int)swDwgPaperSizes_e.swDwgPaperAsize, 0.0, 0.0);
@@ -1319,6 +1354,7 @@ namespace solid_macro
                 false, 1.74532925199433E-02, 1.74532925199433E-02, false, false, false, false, false, false, false, false);
             model.SelectionManager.EnableContourSelection = false;
             model.ClearSelection2(true);
+
 
             AddJsonString("Step 8-9 (Extruded Elliptical Slot)");
 
@@ -1546,6 +1582,16 @@ namespace solid_macro
             AddJsonStartEndString("End", "");
             AddString("}");
             File.WriteAllLines(@"C:\\VAYU\\screw_log" + _scrResCount++ + ".json", _jsonRows);
+
+            _swApp.CloseDoc("");
+            model = null;
+            modelView = null;
+        }
+
+        private void ScrewMacro_Click(object sender, EventArgs e)
+        {
+            for (var idx = 0; idx < Int32.Parse(this.screw_tests_num.Text); ++idx)
+                ExecuteScrewTest();
         }
 
         private void Rotate(ModelDoc2 model)
@@ -1823,7 +1869,6 @@ namespace solid_macro
         /// switcher to avoid redurant logging
         /// </summary>
         private bool _switcher = false;
-
 
         #endregion
     }
