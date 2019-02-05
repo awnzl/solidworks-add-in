@@ -63,6 +63,12 @@ namespace solid_macro
             _modelView = null;
         }
 
+        private void UpdateLabel(string s)
+        {
+            this.current_step_label.Text = s;
+            this.current_step_label.Update();
+        }
+
         //private void OpenAssembly_Click(object sender, System.EventArgs e)
         //{
         //    OpenAssembly();
@@ -76,7 +82,12 @@ namespace solid_macro
             _switcher = false;
             _jsonRows = new List<string>();
 
+            this.BikeProgressBar.Value = 0;
+            UpdateLabel("Opening an assembly");
+
             OpenAssembly();
+
+            UpdateLabel("Step 1 (rectangle)");
 
             AddString("{");
 
@@ -106,10 +117,12 @@ namespace solid_macro
             _model.ClearSelection2(true);
             _model.SketchManager.InsertSketch(true);
 
+            this.BikeProgressBar.Value = 2;
             AddJsonString("Step 1-2 (Rectangle)");
+            UpdateLabel("Step 3 (Extruded cut)");
 
-            //rename sketch
-            _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
+           //rename sketch
+           _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "rectangle");
 
             // Named View
@@ -130,6 +143,8 @@ namespace solid_macro
             _model.Extension.SelectByRay(-0.195096867060234, 0.373588736559441, 2.42894725591936E-02, 0, -1, 0, 7.97352354467751E-03, 2, false, 0, 0);
             _model.SketchManager.InsertSketch(true);
             _model.ClearSelection2(true);
+            this.BikeProgressBar.Value = 6;
+            UpdateLabel("Step 4-5 (four circles)");
 
 
             _model.SketchManager.CreateCircle(-0.182878, -0.022516, 0.0, -0.154241, -0.023788, 0.0);
@@ -141,12 +156,14 @@ namespace solid_macro
             _model.SketchManager.CreateCircle(-0.076589, -0.108653, 0.0, -0.049238, -0.124973, 0.0);
             _model.ClearSelection2(true);
             _model.SketchManager.InsertSketch(true);
+            this.BikeProgressBar.Value = 4;
 
             //rename sketch
             _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "circles");
 
             AddJsonString("Step 4-5 (four circles)");
+            UpdateLabel("Step 6 (extrude cut)");
             // four circles end
 
             _switcher = true;
@@ -157,7 +174,9 @@ namespace solid_macro
             _model.Extension.SelectByID2("Cut-Extrude", "BODYFEATURE", 0, 0, 0, false, 0, null, 0);
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "extrude2");
             _model.ClearSelection2(true);
-            // end of four circles' ectruding - logged by ui handler
+            this.BikeProgressBar.Value = 16;
+            UpdateLabel("Step 7 (Freeform)");
+            // end of four circles' extruding - logged by ui handler
 
 
             // step 7 - freeform
@@ -259,6 +278,8 @@ namespace solid_macro
             Pan(_model);
             AddJsonString("Step 7 (Pan Freeform)");
 
+            this.BikeProgressBar.Value = 22;
+
             _model.Extension.SelectByID2("Freeform", "BODYFEATURE", 0, 0, 0, false, 0, null, 0);
             _model.EditDelete();
 
@@ -291,7 +312,9 @@ namespace solid_macro
             //' Named View
             _model.ShowNamedView2("*Isometric", 7);
             _model.ViewZoomtofit2();
+            UpdateLabel("Step 8 (Mirroring 1)");
 
+            this.BikeProgressBar.Value = 23;
 
             // step 8 - - - - -
             // 1 - - - - - -
@@ -434,7 +457,6 @@ namespace solid_macro
             _model.Extension.SelectByID2("6_pA_spojnica_HEPEK-1@AMD_Bike_by_paX", "COMPONENT", 0, 0, 0, true, 2, null, 0);
             _model.Extension.SelectByID2("Dzidze_2_pA_Vijak.Gornji.Hladnjak.Gornji.Vijak-1@AMD_Bike_by_paX", "COMPONENT", 0, 0, 0, true, 2, null, 0);
 
-
             // Mirror
             Feature swSelMirrorPlane = _model.SelectionManager.GetSelectedObject6(1, 1);
             Feature swMirrorPlane = swSelMirrorPlane.GetSpecificFeature2();
@@ -444,6 +466,7 @@ namespace solid_macro
             int[] swCompsOrient = Enumerable.Range(0, 136).Select(i => 0).ToArray();
 
             AssemblyDoc swAssy = default(AssemblyDoc);
+
             swAssy = (AssemblyDoc)_model;
             swCompsInst[0] = swAssy.GetComponentByName("PIPAK_ZA_ENGINE-1");
             swCompsInst[1] = swAssy.GetComponentByName("10_pA_LAST_ONE-2");
@@ -582,13 +605,13 @@ namespace solid_macro
             swCompsInst[134] = swAssy.GetComponentByName("6_pA_spojnica_HEPEK-1");
             swCompsInst[135] = swAssy.GetComponentByName("Dzidze_2_pA_Vijak.Gornji.Hladnjak.Gornji.Vijak-1");
 
-            DebugLog("arrays are filled");
-
             object swMirrorStatus = null;
             _switcher = true;
             swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
                 (swCompsOrient), false, null, true, null, 0, "Mirror", "", 2098193, false, false, false);
             _model.ClearSelection2(true);
+
+            this.BikeProgressBar.Value = 80;
 
             //swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
             //    (swCompsOrient), false, null, false, null, 0, "Mirror", "", 2098193, false, false, false);
@@ -596,12 +619,11 @@ namespace solid_macro
             //swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, null,
             //    null, false, null, true, null, 0, "Mirror", "", 2098193, false, false, false);
 
-            if (swMirrorStatus == null)
-                DebugLog("first mirroring: swMirrorStatus is null, swAssy.MirrorComponents3 didn't return anything");
+            //if (swMirrorStatus == null)
+            //    DebugLog("first mirroring: swMirrorStatus is null, swAssy.MirrorComponents3 didn't return anything");
 
             _model.ClearSelection();
             _model.ClearSelection2(true);
-
 
             // 2 - - - - - -
             // Selecting for mirror
@@ -882,7 +904,6 @@ namespace solid_macro
             swSelMirrorPlane = _model.SelectionManager.GetSelectedObject6(1, 1);
             swMirrorPlane = swSelMirrorPlane.GetSpecificFeature2();
 
-
             swCompsInst = new Component2[272];
             swCompsOrient = Enumerable.Range(0, 272).Select(i => 0).ToArray();
 
@@ -1159,30 +1180,35 @@ namespace solid_macro
             swCompsInst[270] = swAssy.GetComponentByName("pA_Headset_Crijevo_4-11");
             swCompsInst[271] = swAssy.GetComponentByName("Dzidze_2_pA_Vijak.Gornji.Hladnjak.Donji.Vijak-21");
 
+            UpdateLabel("Step 8 (Mirroring 2)");
             swMirrorStatus = null;
             _switcher = true;
             swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
                 (swCompsOrient), false, null, true, null, 0, "Mirror", "", 2098193, false, false, false);
             _model.ClearSelection2(true);
 
-            if (swMirrorStatus == null)
-                DebugLog("second mirroring: swMirrorStatus is null, swAssy.MirrorComponents3 didn't return anything");
+            this.BikeProgressBar.Value = 90;
+
+            //if (swMirrorStatus == null)
+            //    DebugLog("second mirroring: swMirrorStatus is null, swAssy.MirrorComponents3 didn't return anything");
 
             _model.ClearSelection();
 
             //Rotate
             Rotate(_model);
+            UpdateLabel("Rotate/Roll/Pan/Zoom");
             _model.ClearSelection2(true);
             AddJsonString("Step 9 (Rotate)");
-
+            this.BikeProgressBar.Value = 93;
             //Roll
             Roll(_model);
             _model.ClearSelection2(true);
             AddJsonString("Step 10 (Roll View)");
-
+            this.BikeProgressBar.Value = 97;
             //Pan
             Pan(_model);
             AddJsonString("Step 11 (Pan)");
+            this.BikeProgressBar.Value = 98;
 
             //Zoom
             Zoom(_model);
@@ -1196,7 +1222,11 @@ namespace solid_macro
             AddString("}");
             File.WriteAllLines(@"C:\\VAYU\\bike_log" + _resCount++ + ".json", _jsonRows);
 
+            UpdateLabel("Closing an assembly");
+
             CloseAssembly();
+            this.BikeProgressBar.Value = 0;
+            UpdateLabel("");
         }
 
         private void BikeTest_Click(object sender, System.EventArgs e)
@@ -1858,7 +1888,7 @@ namespace solid_macro
 
         // list of steps for use as prefixes in repaint event handler
         // if will be needed
-        private List<string> _steps = new List<string> { "Step 3 (Extrude cut)", "Step 6 (extrude cut)", "Step 8 (Mirroring 1)", "Step 8 (Mirroring 2)" };
+        private List<string> _steps = new List<string> { "Step 3 (Extruded cut)", "Step 6 (extruded cut)", "Step 8 (Mirroring 1)", "Step 8 (Mirroring 2)" };
         private int _counter = 0;
         private int _resCount = 1;
         private int _scrResCount = 1;
