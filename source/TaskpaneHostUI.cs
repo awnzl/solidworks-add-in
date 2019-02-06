@@ -58,15 +58,25 @@ namespace solid_macro
 
         private void CloseAssembly()
         {
-            _swApp.CloseDoc("C:\\VAYU\\AMD - RADEON\\SKLOPNI_PINKY\\AMD_Bike_by_paX.SLDASM");
+            try {
+                _swApp.CloseDoc("C:\\VAYU\\AMD - RADEON\\SKLOPNI_PINKY\\AMD_Bike_by_paX.SLDASM");
+            } catch (Exception ex) {
+                DebugLog(ex.ToString());
+            }
+
             _model = null;
             _modelView = null;
         }
 
-        private void UpdateLabel(string s)
+        private void UpdateLabel(string cs, bool addTime = true, string ps = "", string ns = "")
         {
-            this.current_step_label.Text = s;
+            this.previous_step_label.Text = addTime ? String.Format("{0}: {1}", ps, (DateTime.Now - _showTime).TotalSeconds) : ps;
+            this.previous_step_label.Update();
+            this.current_step_label.Text = cs + "...";
             this.current_step_label.Update();
+            this.next_step_label.Text = ns;
+            this.next_step_label.Update();
+            _showTime = DateTime.Now;
         }
 
         //private void OpenAssembly_Click(object sender, System.EventArgs e)
@@ -83,16 +93,17 @@ namespace solid_macro
             _jsonRows = new List<string>();
 
             this.BikeProgressBar.Value = 0;
-            UpdateLabel("Opening an assembly");
+            UpdateLabel("Opening an assembly", addTime: false, ns: "Step 1 (rectangle)");
 
             OpenAssembly();
 
-            UpdateLabel("Step 1 (rectangle)");
+            UpdateLabel("Step 1 (rectangle)", addTime: false, ns: "Step 3 (Extruded cut)");
 
             AddString("{");
 
             _startTime = DateTime.Now;
             _previousTime = _startTime;
+            _showTime = _startTime;
             // start of rectangle and cut
             // step - time between the previous and the next logged time starting from this point
             AddJsonStartEndString("Start");
@@ -119,7 +130,7 @@ namespace solid_macro
 
             this.BikeProgressBar.Value = 2;
             AddJsonString("Step 1-2 (Rectangle)");
-            UpdateLabel("Step 3 (Extruded cut)");
+            UpdateLabel("Step 3 (Extruded cut)", ps: "Step 1 (rectangle)", ns: "Step 4-5 (four circles)");
 
            //rename sketch
            _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
@@ -144,7 +155,7 @@ namespace solid_macro
             _model.SketchManager.InsertSketch(true);
             _model.ClearSelection2(true);
             this.BikeProgressBar.Value = 6;
-            UpdateLabel("Step 4-5 (four circles)");
+            UpdateLabel("Step 4-5 (four circles)", ps: "Step 3 (Extruded cut)", ns: "Step 6 (extrude cut)");
 
 
             _model.SketchManager.CreateCircle(-0.182878, -0.022516, 0.0, -0.154241, -0.023788, 0.0);
@@ -163,7 +174,7 @@ namespace solid_macro
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "circles");
 
             AddJsonString("Step 4-5 (four circles)");
-            UpdateLabel("Step 6 (extrude cut)");
+            UpdateLabel("Step 6 (extrude cut)", ps: "Step 4-5 (four circles)", ns: "Step 7 (Freeform)");
             // four circles end
 
             _switcher = true;
@@ -175,7 +186,7 @@ namespace solid_macro
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "extrude2");
             _model.ClearSelection2(true);
             this.BikeProgressBar.Value = 16;
-            UpdateLabel("Step 7 (Freeform)");
+            UpdateLabel("Step 7 (Freeform)", ps: "Step 6 (extrude cut)", ns: "Step 8 (Mirroring 1)");
             // end of four circles' extruding - logged by ui handler
 
 
@@ -312,7 +323,7 @@ namespace solid_macro
             //' Named View
             _model.ShowNamedView2("*Isometric", 7);
             _model.ViewZoomtofit2();
-            UpdateLabel("Step 8 (Mirroring 1)");
+            UpdateLabel("Step 8 (Mirroring 1)", ps: "Step 7 (Freeform)", ns: "Step 8 (Mirroring 2)");
 
             this.BikeProgressBar.Value = 23;
 
@@ -1180,7 +1191,7 @@ namespace solid_macro
             swCompsInst[270] = swAssy.GetComponentByName("pA_Headset_Crijevo_4-11");
             swCompsInst[271] = swAssy.GetComponentByName("Dzidze_2_pA_Vijak.Gornji.Hladnjak.Donji.Vijak-21");
 
-            UpdateLabel("Step 8 (Mirroring 2)");
+            UpdateLabel("Step 8 (Mirroring 2)", ps: "Step 8 (Mirroring 1)", ns: "Rotate/Roll/Pan/Zoom");
             swMirrorStatus = null;
             _switcher = true;
             swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
@@ -1196,7 +1207,7 @@ namespace solid_macro
 
             //Rotate
             Rotate(_model);
-            UpdateLabel("Rotate/Roll/Pan/Zoom");
+            UpdateLabel("Rotate/Roll/Pan/Zoom", ps: "Step 8 (Mirroring 2)", ns: "Close Assembly");
             _model.ClearSelection2(true);
             AddJsonString("Step 9 (Rotate)");
             this.BikeProgressBar.Value = 93;
@@ -1222,17 +1233,21 @@ namespace solid_macro
             AddString("}");
             File.WriteAllLines(@"C:\\VAYU\\bike_log" + _resCount++ + ".json", _jsonRows);
 
-            UpdateLabel("Closing an assembly");
+            UpdateLabel("Closing an assembly", addTime: false);
 
             CloseAssembly();
             this.BikeProgressBar.Value = 0;
-            UpdateLabel("");
+            UpdateLabel("", addTime: false);
         }
 
         private void BikeTest_Click(object sender, System.EventArgs e)
         {
             for (var idx = 0; idx < Int32.Parse(this.bike_tests_num.Text); ++idx)
+            {
                 ExecuteBikeTest();
+                System.Threading.Thread.Sleep(1000);
+                //System.Threading.Thread.Sleep(1000 * 120);//TODO: rm, just test of execute time increasing during num of runs
+            }
         }
 
         private void ExecuteScrewTest()
@@ -1894,6 +1909,7 @@ namespace solid_macro
         private int _scrResCount = 1;
         private DateTime _startTime;
         private DateTime _previousTime;
+        private DateTime _showTime;
 
         /// <summary>
         /// switcher to avoid redurant logging
