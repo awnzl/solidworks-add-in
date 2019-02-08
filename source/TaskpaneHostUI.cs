@@ -65,13 +65,12 @@ namespace solid_macro
 
         private void UpdateLabel(string cs, bool addTime = true, string ps = "", string ns = "")
         {
-            this.previous_step_label.Text = addTime ? String.Format("{0}: {1}", ps, (DateTime.Now - _showTime).TotalSeconds) : ps;
+            this.previous_step_label.Text = addTime ? String.Format("{0}: {1}", ps, "done") : ps;
             this.previous_step_label.Update();
             this.current_step_label.Text = cs + "...";
             this.current_step_label.Update();
             this.next_step_label.Text = ns;
             this.next_step_label.Update();
-            _showTime = DateTime.Now;
         }
 
         //private void OpenAssembly_Click(object sender, System.EventArgs e)
@@ -98,7 +97,6 @@ namespace solid_macro
 
             _startTime = DateTime.Now;
             _previousTime = _startTime;
-            _showTime = _startTime;
             // start of rectangle and cut
             // step - time between the previous and the next logged time starting from this point
             AddJsonStartEndString("Start");
@@ -1912,7 +1910,6 @@ namespace solid_macro
         private int _scrResCount = 1;
         private DateTime _startTime;
         private DateTime _previousTime;
-        private DateTime _showTime;
 
         /// <summary>
         /// switcher to avoid redurant logging
