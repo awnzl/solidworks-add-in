@@ -58,12 +58,7 @@ namespace solid_macro
 
         private void CloseAssembly()
         {
-            try {
-                _swApp.CloseDoc("C:\\VAYU\\AMD - RADEON\\SKLOPNI_PINKY\\AMD_Bike_by_paX.SLDASM");
-            } catch (Exception ex) {
-                DebugLog(ex.ToString());
-            }
-
+            _swApp.CloseDoc("C:\\VAYU\\AMD - RADEON\\SKLOPNI_PINKY\\AMD_Bike_by_paX.SLDASM");
             _model = null;
             _modelView = null;
         }
@@ -1244,10 +1239,17 @@ namespace solid_macro
         {
             for (var idx = 0; idx < Int32.Parse(this.bike_tests_num.Text); ++idx)
             {
-                ExecuteBikeTest();
-                System.Threading.Thread.Sleep(1000);
-                //System.Threading.Thread.Sleep(1000 * 120);//TODO: rm, just test of execute time increasing during num of runs
+                try {
+                    this.iteration_label.Text = String.Format("Iteration: {0}", idx + 1);
+                    this.iteration_label.Update();
+                    ExecuteBikeTest();
+                } catch (Exception ex) {
+                    DebugLog(ex.ToString());
+                }
+                System.Threading.Thread.Sleep(1000 * 2);
             }
+            this.iteration_label.Text = "";
+            this.iteration_label.Update();
         }
 
         private void ExecuteScrewTest()
@@ -1873,6 +1875,7 @@ namespace solid_macro
         {
             _jsonRows.Add(String.Format("\t\"{0}\": \"{1}\"{2}", s, DateTime.Now.ToString("dd/MM/y hh:mm:ss tt"), end));
             _previousTime = DateTime.Now;
+            DebugLog(String.Format("\t\"{0}\": \"{1}\"", s, DateTime.Now.ToString("dd/MM/y hh:mm:ss tt")));
         }
 
         private void AddTotalTimeJsonString() =>
