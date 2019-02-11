@@ -42,26 +42,19 @@ def calculate_average(values, columns_num, rows_num):
 def calculate_deviations(values, columns_num, rows_num):
     result = []
 
-    # print(values, end='\n\n')
-
     'fill first data-row'
     for v in values[:columns_num]:
         result.append(v)
         result.append(0.0)
 
-    # print(result, end='\n\n')
-
     'switch-dictionary with average values of each column'
     av = dict(enumerate(values[:columns_num]))
-    # print(av, end='\n\n')
 
     idx = 0
     for v in values[columns_num:]:
         result.append(v)
         result.append(v / av[idx % columns_num] - 1)
         idx += 1
-
-    # print(result, end='\n\n')
 
     return result
 
