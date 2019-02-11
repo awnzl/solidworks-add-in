@@ -125,8 +125,8 @@ namespace solid_macro
             AddJsonString("Step 1-2 (Rectangle)");
             UpdateLabel("Step 3 (Extruded cut)", ps: "Step 1 (rectangle)", ns: "Step 4-5 (four circles)");
 
-           //rename sketch
-           _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
+            //rename sketch
+            _model.Extension.SelectByID2("Sketch", "SKETCH", 0, 0, 0, false, 0, null, 0);
             _model.SelectedFeatureProperties(0, 0, 0, 0, 0, 0, 0, true, false, "rectangle");
 
             // Named View
@@ -218,9 +218,7 @@ namespace solid_macro
             _swApp.ActivateDoc2("2Rezervoar_1_pA_rezevoarXXXXXXXXXXXXXXX", false, errors);
             _model = _swApp.ActiveDoc;
             _model.ClearSelection2(true);
-            //_model.Extension.SelectByRay(-0.11243124114651, 0.41242278871249, -2.74096530663428E-02,
-            //    -0.751191127381133, -0.463399926235297, -0.470077013380769, 2.80786861049484E-03, 2, false, 0, 0);
-            //_model.ClearSelection2(true);
+
             _model.Extension.SelectByRay(-0.11243124114651, 0.41242278871249, -2.74096530663428E-02,
                 -0.751191127381133, -0.463399926235297, -0.470077013380769, 2.80786861049484E-03, 2, false, 1, 0);
             _model.FeatureManager.SetFreeformBoundaryContinuity(0, 0);
@@ -617,14 +615,6 @@ namespace solid_macro
 
             this.BikeProgressBar.Value = 80;
 
-            //swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, (swCompsInst),
-            //    (swCompsOrient), false, null, false, null, 0, "Mirror", "", 2098193, false, false, false);
-
-            //swMirrorStatus = swAssy.MirrorComponents3(swMirrorPlane, null,
-            //    null, false, null, true, null, 0, "Mirror", "", 2098193, false, false, false);
-
-            //if (swMirrorStatus == null)
-            //    DebugLog("first mirroring: swMirrorStatus is null, swAssy.MirrorComponents3 didn't return anything");
 
             _model.ClearSelection();
             _model.ClearSelection2(true);
@@ -1199,18 +1189,18 @@ namespace solid_macro
             _model.ClearSelection();
 
             //Rotate
-            Rotate(_model);
+            BikeRotate(_model);
             UpdateLabel("Rotate/Roll/Pan/Zoom", ps: "Step 8 (Mirroring 2)", ns: "Close Assembly");
             _model.ClearSelection2(true);
             AddJsonString("Step 9 (Rotate)");
             this.BikeProgressBar.Value = 93;
             //Roll
-            Roll(_model);
+            BikeRoll(_model);
             _model.ClearSelection2(true);
             AddJsonString("Step 10 (Roll View)");
             this.BikeProgressBar.Value = 97;
             //Pan
-            Pan(_model);
+            BikePan(_model);
             AddJsonString("Step 11 (Pan)");
             this.BikeProgressBar.Value = 98;
 
@@ -1327,15 +1317,6 @@ namespace solid_macro
             // Zoom In/Out (MouseWheel)
             ModelView modelView = model.ActiveView;
             modelView.Scale2 = 62.9559929971706;
-            //double[] translation = new double[3];
-            //translation[0] = 5.69150794265615;
-            //translation[1] = -0.859489220519109;
-            //translation[2] = 0;
-
-
-            //MathUtility mathUtils = _swApp.GetMathUtility();
-            //MathVector transVector = mathUtils.CreateVector(translation);
-            //modelView.Translation3 = transVector;
             model.ClearSelection2(true);
 
             model.SketchManager.CreateLine(-0.09, 0.013531, 0, -0.089095, 0.014551, 0);
@@ -1738,6 +1719,45 @@ namespace solid_macro
             mv.RollBy(0.3);
         }
 
+        private void BikeRotate(ModelDoc2 model)
+        {
+            ModelView mv = model.ActiveView;
+            mv.RotateAboutCenter(-3.43611696486384E-03, 7.42108500847984E-03);
+            mv.RotateAboutCenter(0, 0.363633165415512);
+            mv.RotateAboutCenter(0, 0.356212080407032);
+            mv.RotateAboutCenter(0, -0.645634395737746);
+            mv.RotateAboutCenter(0, -0.400738590457911);
+            mv.RotateAboutCenter(0, -3.71054250423992E-02);
+            mv.RotateAboutCenter(0, -7.42108500847984E-03);
+            mv.RotateAboutCenter(-0.161497497348601, 5.93686800678387E-02);
+            mv.RotateAboutCenter(-0.31268664380261, 7.42108500847984E-03);
+            mv.RotateAboutCenter(-4.81056375080938E-02, -2.96843400339194E-02);
+            mv.RotateAboutCenter(-3.43611696486384E-02, -1.48421700169597E-02);
+            mv.RotateAboutCenter(0.171805848243192, 4.45265100508791E-02);
+            mv.RotateAboutCenter(0.151189146454009, 2.22632550254395E-02);
+            mv.RotateAboutCenter(9.96473919810515E-02, -1.48421700169597E-02);
+            mv.RotateAboutCenter(5.49778714378215E-02, 0);
+        }
+
+        private void BikeRoll(ModelDoc2 model)
+        {
+            ModelView mv = model.ActiveView;
+            mv.RollBy(-0.3);
+            mv.RollBy(-0.3);
+            mv.RollBy(-0.3);
+            mv.RollBy(-0.3);
+            mv.RollBy(-0.3);
+            mv.RollBy(-0.3);
+            mv.RollBy(-0.3);
+            mv.RollBy(0.3);
+            mv.RollBy(0.3);
+            mv.RollBy(0.3);
+            mv.RollBy(0.3);
+            mv.RollBy(0.3);
+            mv.RollBy(0.3);
+            mv.RollBy(0.3);
+        }
+
         private void Pan(ModelDoc2 model)
         {
             ModelView mv = model.ActiveView;
@@ -1808,6 +1828,55 @@ namespace solid_macro
             mv.TranslateBy(-0.002767948717949, -0.003321538461538);
             mv.TranslateBy(-0.001660769230769, -0.001660769230769);
             mv.TranslateBy(-0.0005535897435897, -0.001107179487179);
+            mv.TranslateBy(0, -0.0005535897435897);
+            mv.TranslateBy(0, 0.0005535897435897);
+            mv.TranslateBy(0, 0.0005535897435897);
+        }
+
+        private void BikePan(ModelDoc2 model)
+        {
+            ModelView mv = model.ActiveView;
+            mv.TranslateBy(-0.0005535897435897, 0);
+            mv.TranslateBy(-0.0005535897435897, 0);
+            mv.TranslateBy(-0.005535897435897, 0.0005535897435897);
+            mv.TranslateBy(-0.007196666666667, 0);
+            mv.TranslateBy(-0.005535897435897, 0);
+            mv.TranslateBy(-0.002214358974359, 0);
+            mv.TranslateBy(-0.0005535897435897, 0);
+            mv.TranslateBy(0, -0.0005535897435897);
+            mv.TranslateBy(0, -0.001107179487179);
+            mv.TranslateBy(0.001107179487179, -0.002214358974359);
+            mv.TranslateBy(0.001660769230769, -0.004982307692308);
+            mv.TranslateBy(0, -0.001107179487179);
+            mv.TranslateBy(0, 0.0005535897435897);
+            mv.TranslateBy(0, 0.001107179487179);
+            mv.TranslateBy(0.0005535897435897, 0.0005535897435897);
+            mv.TranslateBy(0.003875128205128, 0.006643076923077);
+            mv.TranslateBy(0.002214358974359, 0.004428717948718);
+            mv.TranslateBy(0, 0.001107179487179);
+            mv.TranslateBy(-0.0005535897435897, 0);
+            mv.TranslateBy(-0.0005535897435897, 0);
+            mv.TranslateBy(-0.001660769230769, 0);
+            mv.TranslateBy(-0.003875128205128, 0.0005535897435897);
+            mv.TranslateBy(-0.01328615384615, 0.002767948717949);
+            mv.TranslateBy(-0.01328615384615, 0.002767948717949);
+            mv.TranslateBy(-0.002767948717949, 0.0005535897435897);
+            mv.TranslateBy(0.0005535897435897, 0);
+            mv.TranslateBy(0.002767948717949, 0);
+            mv.TranslateBy(0.008857435897436, -0.0005535897435897);
+            mv.TranslateBy(0.02435794871795, -0.001660769230769);
+            mv.TranslateBy(0.004428717948718, -0.004982307692308);
+            mv.TranslateBy(0.001660769230769, -0.003875128205128);
+            mv.TranslateBy(0, -0.001660769230769);
+            mv.TranslateBy(0.0005535897435897, -0.0005535897435897);
+            mv.TranslateBy(0.001660769230769, 0);
+            mv.TranslateBy(0.002214358974359, 0);
+            mv.TranslateBy(0.008303846153846, 0.001107179487179);
+            mv.TranslateBy(0.009411025641026, 0.004428717948718);
+            mv.TranslateBy(-0.006643076923077, 0);
+            mv.TranslateBy(-0.006089487179487, 0);
+            mv.TranslateBy(-0.008857435897436, 0);
+            mv.TranslateBy(-0.006643076923077, -0.001107179487179);
             mv.TranslateBy(0, -0.0005535897435897);
             mv.TranslateBy(0, 0.0005535897435897);
             mv.TranslateBy(0, 0.0005535897435897);
